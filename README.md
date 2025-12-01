@@ -2,7 +2,7 @@
 
 纯命令行工具，自动从 GitHub 拉取最新/指定版本的 MenthaMC/Mint 服务器，测速选最快源，支持哈希校验避免覆盖本地修改。
 
-## 使用（仅系统属性）
+## 使用
 所有参数通过系统属性传入；未填写时用配置文件或默认值。
 ```bash
 java \
@@ -27,5 +27,5 @@ java \
 
 ## 构建
 ```bash
-./gradlew shadowJar   # 生成 build/libs/mint-launcher-cli.jar
+./gradlew shadowJar
 ```
