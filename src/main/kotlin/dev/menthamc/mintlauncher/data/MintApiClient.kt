@@ -86,7 +86,7 @@ class MintApiClient(
         val results = mutableListOf<ProxyTiming>()
         var best: Pair<Long, Pair<ProxySource, String>>? = null
         var bestSpeed: Long = 0L
-        val testRange = 128 * 1024 // 较小的测速范围，加快探测
+        val testRange = 128 * 1024
         val testTimeout = Duration.ofSeconds(2)
         options.forEach { (source, url) ->
             try {
@@ -323,7 +323,7 @@ private fun instantSpeed(
     currentNs: Long
 ): Long {
     val deltaBytes = (currentBytes - lastBytes).coerceAtLeast(0L)
-    val deltaNs = (currentNs - lastNs).coerceAtLeast(5_000_000L) // >=5ms
+    val deltaNs = (currentNs - lastNs).coerceAtLeast(5_000_000L)
     val deltaSec = deltaNs / 1_000_000_000.0
     val inst = (deltaBytes / deltaSec).toLong()
     val overall = bytesPerSecond(startNs, currentBytes, currentNs)

@@ -1,8 +1,5 @@
-package dev.menthamc.mintlauncher.data
+﻿package dev.menthamc.mintlauncher.data
 
-/**
- * 下载源列表。ORIGIN 代表不走代理。
- */
 enum class ProxySource(val baseUrl: String) {
     ORIGIN(""),
     GHFAST("https://ghfast.top"),

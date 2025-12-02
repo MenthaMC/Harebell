@@ -228,7 +228,6 @@ private fun sha256(path: java.nio.file.Path): String {
     return digest.digest().joinToString("") { "%02x".format(it) }
 }
 
-// ---- CLI 输出样式 ----
 private fun cliBanner(title: String, desc: String? = null) {
     println("===================================================")
     println(" $title")
