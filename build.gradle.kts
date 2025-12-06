@@ -30,6 +30,6 @@ tasks.named<ShadowJar>("shadowJar") {
     mergeServiceFiles()
     minimize()
     manifest {
-        attributes["Main-Class"] = "dev.menthamc.mintlauncher.CliMainKt"
+        attributes["Main-Class"] = "dev.menthamc.harebell.CliMainKt"
     }
 }
