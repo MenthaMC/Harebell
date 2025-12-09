@@ -80,7 +80,7 @@ object CliMain {
             return
         }
         val releaseTag = release.tagName
-        cliInfo("最新版本: $releaseTag / Latest version: $releaseTag")
+        cliInfo("最新版本 / Latest version: $releaseTag")
 
         val asset = chooseJarAsset(release, repoTarget)
             ?: run {
