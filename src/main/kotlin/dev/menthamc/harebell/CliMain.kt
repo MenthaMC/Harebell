@@ -47,6 +47,17 @@ object CliMain {
             RepoTarget(repoOwner, repoName)
         }
 
+/*        val branchToUse = if (branchInput == null) {
+            BranchInit(language, repoTarget).init()
+        } else {
+            branchInput.trim().takeIf { it.isNotEmpty() && !it.equals("latest", ignoreCase = true) } ?: "latest"
+        }
+
+        if (branchToUse == "unknown") {
+            cliError(tr(language, "无法确定要使用的分支，退出", "Unable to determine branch to use, exiting"))
+            return
+        }*/
+
         val apiClient = GithubApiClient(repoTarget = repoTarget)
         printIntro(
             repoUrl = REPO_URL,
@@ -73,6 +84,7 @@ object CliMain {
             return
         }
 
+//        val normalizedBranch = if (branchToUse != "latest") branchToUse else null
         val normalizedBranch = branchInput?.trim()
             ?.takeIf { it.isNotEmpty() && !it.equals("latest", ignoreCase = true) }
         val release = normalizedBranch?.let { branch ->
