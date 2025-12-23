@@ -1,6 +1,7 @@
 ﻿package dev.menthamc.harebell
 
 import dev.menthamc.harebell.data.*
+import dev.menthamc.harebell.util.TerminalEncodeHelper
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -16,6 +17,7 @@ fun main(args: Array<String>) = CliMain.main(args)
 object CliMain {
     @JvmStatic
     fun main(args: Array<String>) {
+        TerminalEncodeHelper.detectAndSetEncoding()
         val configStore = LauncherConfigStore()
         var config = configStore.load()
         val configSourcePath = configStore.configSourcePath()
