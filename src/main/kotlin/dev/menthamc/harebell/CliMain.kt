@@ -67,12 +67,30 @@ object CliMain {
             language = language
         )
         configSourcePath?.let {
-            cliInfo(tr(language, "已找到配置文件: ${it.toAbsolutePath()}", "Configuration file found: ${it.toAbsolutePath()}"))
+            cliInfo(
+                tr(
+                    language,
+                    "已找到配置文件: ${it.toAbsolutePath()}",
+                    "Configuration file found: ${it.toAbsolutePath()}"
+                )
+            )
         }
-            ?: cliInfo(tr(language, "未找到配置文件，将使用默认配置并生成 harebell.json", "No configuration file found, will use default configuration and generate harebell.json"))
+            ?: cliInfo(
+                tr(
+                    language,
+                    "未找到配置文件，将使用默认配置并生成 harebell.json",
+                    "No configuration file found, will use default configuration and generate harebell.json"
+                )
+            )
 
         if (installDir.isBlank()) {
-            cliError(tr(language, "缺少下载目录：请提供 -DinstallDir=目录 或在配置文件/参数中指定", "Missing download directory: Please provide -DinstallDir=directory or specify in config file/parameters"))
+            cliError(
+                tr(
+                    language,
+                    "缺少下载目录：请提供 -DinstallDir=目录 或在配置文件/参数中指定",
+                    "Missing download directory: Please provide -DinstallDir=directory or specify in config file/parameters"
+                )
+            )
             return
         }
 
@@ -100,7 +118,13 @@ object CliMain {
 
         val asset = chooseJarAsset(release, repoTarget)
             ?: run {
-                cliError(tr(language, "该 Release 下没有 jar 资源，请检查 GitHub 页面", "No jar assets found in this Release, please check GitHub page"))
+                cliError(
+                    tr(
+                        language,
+                        "该 Release 下没有 jar 资源，请检查 GitHub 页面",
+                        "No jar assets found in this Release, please check GitHub page"
+                    )
+                )
                 return
             }
 
@@ -114,11 +138,23 @@ object CliMain {
         if (Files.exists(target) && config.jarHash.isNotBlank()) {
             val currentHash = sha256(target)
             if (currentHash.equals(config.jarHash, ignoreCase = true)) {
-                cliInfo(tr(language, "本地 hash 与配置一致，跳过下载: $targetName", "Local hash matches configuration, skipping download: $targetName"))
+                cliInfo(
+                    tr(
+                        language,
+                        "本地 hash 与配置一致，跳过下载: $targetName",
+                        "Local hash matches configuration, skipping download: $targetName"
+                    )
+                )
                 needDownload = false
                 finalHash = currentHash
             } else {
-                cliInfo(tr(language, "本地 hash 与配置不一致，执行更新: $targetName", "Local hash does not match configuration, performing update: $targetName"))
+                cliInfo(
+                    tr(
+                        language,
+                        "本地 hash 与配置不一致，执行更新: $targetName",
+                        "Local hash does not match configuration, performing update: $targetName"
+                    )
+                )
                 updateDetected = true
             }
         }
@@ -141,7 +177,13 @@ object CliMain {
                             cliInfo(tr(language, "未找到提交信息", "No commit information found"))
                         }
                     } catch (e: Exception) {
-                        cliInfo(tr(language, "获取提交信息失败: ${e.message}", "Failed to fetch commit information: ${e.message}"))
+                        cliInfo(
+                            tr(
+                                language,
+                                "获取提交信息失败: ${e.message}",
+                                "Failed to fetch commit information: ${e.message}"
+                            )
+                        )
                     }
                 } else if (isFirstRun) {
                     cliInfo(tr(language, "未找到提交信息", "No commit information found"))
@@ -149,7 +191,13 @@ object CliMain {
             }
             val proxyChoice = apiClient.resolveDownloadUrl(asset) { timing ->
                 val speedText = timing.bytesPerSec?.let { formatSpeed(it) } ?: "fail"
-                cliInfo(tr(language, "测速: ${timing.source} -> $speedText", "Speed test: ${timing.source} -> $speedText"))
+                cliInfo(
+                    tr(
+                        language,
+                        "测速: ${timing.source} -> $speedText",
+                        "Speed test: ${timing.source} -> $speedText"
+                    )
+                )
             }
 
             try {
@@ -162,9 +210,21 @@ object CliMain {
                         "${t.source}=$speed"
                     }
                 cliInfo(tr(language, "测速: $timingsText", "Speed test: $timingsText"))
-                cliStep(tr(language, "下载: $targetName (源文件: ${asset.name})", "Downloading: $targetName (source file: ${asset.name})"))
+                cliStep(
+                    tr(
+                        language,
+                        "下载: $targetName (源文件: ${asset.name})",
+                        "Downloading: $targetName (source file: ${asset.name})"
+                    )
+                )
                 proxyChoice.proxyHost?.let {
-                    cliInfo(tr(language, "使用下载源: ${proxyChoice.source} -> $it", "Using download source: ${proxyChoice.source} -> $it"))
+                    cliInfo(
+                        tr(
+                            language,
+                            "使用下载源: ${proxyChoice.source} -> $it",
+                            "Using download source: ${proxyChoice.source} -> $it"
+                        )
+                    )
                 }
                 apiClient.downloadAsset(
                     asset = asset,
@@ -174,7 +234,13 @@ object CliMain {
                         val totalText = total?.let { "/ ${formatBytes(it)}" } ?: ""
                         val pct = total?.let { (downloaded * 100 / it).coerceIn(0, 100) }
                         val pctText = pct?.let { " ($it%)" } ?: ""
-                        cliProgress(tr(language, "下载进度: ${formatBytes(downloaded)}$totalText$pctText", "Download progress: ${formatBytes(downloaded)}$totalText$pctText"))
+                        cliProgress(
+                            tr(
+                                language,
+                                "下载进度: ${formatBytes(downloaded)}$totalText$pctText",
+                                "Download progress: ${formatBytes(downloaded)}$totalText$pctText"
+                            )
+                        )
                     }
                 )
                 cliOk(tr(language, "下载完成: $targetName", "Download completed: $targetName"))
@@ -264,7 +330,10 @@ private fun printIntro(repoUrl: String, installDir: String, jarName: String, sho
 
     println()
     val infoLines = mutableListOf<String>()
-    infoLines += accent(tr(language, "Harebell 更新程序已准备就绪", "Harebell Update Program Ready"), "\u001B[38;5;183m")
+    infoLines += accent(
+        tr(language, "Harebell 更新程序已准备就绪", "Harebell Update Program Ready"),
+        "\u001B[38;5;183m"
+    )
     infoLines += tr(language, "了解更多: $repoUrl", "Learn more: $repoUrl")
     printBox(infoLines)
 }

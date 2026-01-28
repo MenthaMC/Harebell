@@ -3,10 +3,10 @@ package dev.menthamc.harebell.data
 import dev.menthamc.harebell.Language
 import dev.menthamc.harebell.tr
 import kotlinx.serialization.json.Json
+import java.net.URI
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
-import java.net.URI
 import java.time.Duration
 
 class BranchInit(private val language: Language, private val repoTarget: RepoTarget) {
@@ -27,15 +27,19 @@ class BranchInit(private val language: Language, private val repoTarget: RepoTar
 
         val defaultBranch = getDefaultBranchName()
         var currentPage = 0
-        val pageSize = 10
+        val pageSize = 9
 
         while (true) {
             val totalPages = Math.ceil(branches.size.toDouble() / pageSize).toInt()
 
             displayPage(branches, currentPage, pageSize, defaultBranch, totalPages)
 
-            print(msg("请选择分支编号，输入 'n' 下一页，'p' 上一页，直接回车选择默认分支 [$defaultBranch]: ",
-                     "Select branch number, 'n' for next page, 'p' for previous page, press Enter for default [$defaultBranch]: "))
+            print(
+                msg(
+                    "请选择分支编号，输入 'n' 下一页，'p' 上一页，直接回车选择默认分支 [$defaultBranch]: ",
+                    "Select branch number, 'n' for next page, 'p' for previous page, press Enter for default [$defaultBranch]: "
+                )
+            )
 
             val input = readlnOrNull()?.trim()
 
@@ -46,11 +50,13 @@ class BranchInit(private val language: Language, private val repoTarget: RepoTar
                         println(msg("已经是最后一页", "Already on the last page"))
                     }
                 }
+
                 input.equals("p", ignoreCase = true) -> {
                     if (currentPage > 0) currentPage-- else {
                         println(msg("已经是第一页", "Already on the first page"))
                     }
                 }
+
                 input.toIntOrNull() != null -> {
                     val pageNum = input.toInt()
                     val startIndex = currentPage * pageSize
@@ -64,6 +70,7 @@ class BranchInit(private val language: Language, private val repoTarget: RepoTar
                         println(msg("无效的分支编号", "Invalid branch number"))
                     }
                 }
+
                 else -> println(msg("无效输入", "Invalid input"))
             }
         }
@@ -101,7 +108,12 @@ class BranchInit(private val language: Language, private val repoTarget: RepoTar
                 defaultBranchName = repoInfo.defaultBranch
                 return defaultBranchName!!
             } else {
-                println(msg("获取仓库信息失败: HTTP ${response.statusCode()}", "Failed to fetch repository info: HTTP ${response.statusCode()}"))
+                println(
+                    msg(
+                        "获取仓库信息失败: HTTP ${response.statusCode()}",
+                        "Failed to fetch repository info: HTTP ${response.statusCode()}"
+                    )
+                )
                 val fallbackBranch = findFallbackDefaultBranch(getAllBranches())
                 defaultBranchName = fallbackBranch
                 return fallbackBranch
@@ -121,31 +133,46 @@ class BranchInit(private val language: Language, private val repoTarget: RepoTar
             ?: "unknown"
     }
 
-    private fun displayPage(branches: List<BranchInfo>, currentPage: Int, pageSize: Int, defaultBranch: String, totalPages: Int) {
-        val startIndex = currentPage * pageSize
-        val endIndex = Math.min(startIndex + pageSize, branches.size)
-        val pageBranches = branches.subList(startIndex, endIndex)
-
-        println(msg("\n=== 分支列表 - 第 ${currentPage + 1} 页 (共 $totalPages 页) ===",
-                   "\n=== Branch List - Page ${currentPage + 1} of $totalPages ==="))
+    private fun displayPage(
+        branches: List<BranchInfo>,
+        currentPage: Int,
+        pageSize: Int,
+        defaultBranch: String,
+        totalPages: Int
+    ) {
+        println(
+            msg(
+                "\n=== 分支列表 - 第 ${currentPage + 1} 页 (共 $totalPages 页) ===",
+                "\n=== Branch List - Page ${currentPage + 1} of $totalPages ==="
+            )
+        )
 
         if (currentPage == 0) {
-            val defaultBranchInfo = pageBranches.find { it.name == defaultBranch }
+            val defaultBranchInfo = branches.find { it.name == defaultBranch }
+            val otherBranches = branches.filter { it.name != defaultBranch }
+
             if (defaultBranchInfo != null) {
                 println("1. ${defaultBranchInfo.name} (默认分支)")
-                val remainingBranches = pageBranches.filter { branch -> branch.name != defaultBranch }
+                val remainingBranches = otherBranches.take(pageSize - 1)
                 remainingBranches.forEachIndexed { index, branch ->
                     println("${index + 2}. ${branch.name}")
                 }
             } else {
+                val pageBranches = otherBranches.take(pageSize)
                 pageBranches.forEachIndexed { index, branch ->
                     println("${index + 1}. ${branch.name}")
                 }
             }
         } else {
-            pageBranches.forEachIndexed { index, branch ->
-                val actualIndex = startIndex + index + 1
-                println("$actualIndex. ${branch.name}")
+            val otherBranches = branches.filter { it.name != defaultBranch }
+            val startIndex = currentPage * pageSize - 1
+            val endIndex = minOf(startIndex + pageSize, otherBranches.size)
+
+            if (startIndex < otherBranches.size) {
+                val pageBranches = otherBranches.subList(startIndex, endIndex)
+                pageBranches.forEachIndexed { index, branch ->
+                    println("${index + 1}. ${branch.name}")
+                }
             }
         }
     }
@@ -167,7 +194,12 @@ class BranchInit(private val language: Language, private val repoTarget: RepoTar
                 val branches = json.decodeFromString<List<BranchInfo>>(responseBody)
                 return branches
             } else {
-                println(msg("获取分支失败: HTTP ${response.statusCode()}", "Failed to fetch branches: HTTP ${response.statusCode()}"))
+                println(
+                    msg(
+                        "获取分支失败: HTTP ${response.statusCode()}",
+                        "Failed to fetch branches: HTTP ${response.statusCode()}"
+                    )
+                )
                 return emptyList()
             }
         } catch (e: Exception) {

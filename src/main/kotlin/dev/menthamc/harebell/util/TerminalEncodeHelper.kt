@@ -3,7 +3,7 @@ package dev.menthamc.harebell.util;
 import java.nio.charset.Charset
 
 object TerminalEncodeHelper {
-     fun detectAndSetEncoding() {
+    fun detectAndSetEncoding() {
         val systemEncoding = Charset.defaultCharset().displayName()
         val terminalEncoding = System.getenv("LANG")?.substringBefore('.')?.takeIf { it.isNotBlank() }
         val consoleCharset = runCatching { System.console()?.charset() }.getOrNull()
